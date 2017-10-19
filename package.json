@@ -1,6 +1,6 @@
 {
   "name": "buenos-changelog",
-  "version": "0.0.1-0",
+  "version": "0.1.0-0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KrekkieD/buenos-changelog.git"
+    "url": "https://github.com/KrekkieD/buenos-changelog"
+  },
+  "bin": {
+    "buenos-changelog": "bin/buenos-changelog"
   },
   "keywords": [],
   "author": "",

@@ -1,5 +1,6 @@
 const $childProcess = require('child_process');
 const $path = require('path');
+const $fs = require('fs');
 
 const $upTheTree = require('up-the-tree');
 const $semver = require('semver');
@@ -8,14 +9,15 @@ const $conventionalCommitsParser = require('conventional-commits-parser');
 const $conventionalChangelogWriter = require('conventional-changelog-writer');
 const $conventionalChangelogAngular = require('conventional-changelog-angular');
 
-const $packageJson = require($path.resolve($upTheTree('.git'), 'package.json'));
+const gitRoot = $upTheTree('.git');
+const $packageJson = require($path.resolve(gitRoot, 'package.json'));
 
 const maxConcurrentExec = 5;
 let currentConcurrentExec = 0;
 
 const cmdQueue = [];
 
-const includeTypes = [
+const DEFAULT_INCLUDE_TYPES = [
     'feature',
     'bugfix',
     'perf',
@@ -23,7 +25,7 @@ const includeTypes = [
     'style'
 ];
 
-const typeMap = {
+const DEFAULT_TYPE_MAP = {
     feature: 'Features',
     bugfix: 'Bug Fixes',
     perf: 'Performance Improvements',
@@ -37,6 +39,13 @@ const typeMap = {
     merge: 'Merges',
     version: 'Versioning'
 };
+
+const changelogConfig = _readConfig(gitRoot);
+
+const includeTypes = changelogConfig.includeTypes || DEFAULT_INCLUDE_TYPES;
+const typeMap = changelogConfig.typeMap || DEFAULT_TYPE_MAP;
+const repoCompareUrl = changelogConfig.repoCompareUrl || null;
+const jiraUrl = changelogConfig.jiraUrl || null;
 
 _getAllCommits()
     .then(commits => {
@@ -237,10 +246,10 @@ function getWriterOpts () {
                 commit.hash = commit.hash.substring(0, 7);
             }
 
-            if (typeof commit.subject === 'string') {
+            if (typeof commit.subject === 'string' && jiraUrl) {
                 commit.subject = commit.subject.replace(/</g, '&lt;');
                 // add link to jira for things that look like issue numbers
-                commit.subject = commit.subject.replace(/((\b[A-Z]{3,}-\d+\b)+)/g, '[$1](https://jira.devnet.klm.com/browse/$1)');
+                commit.subject = commit.subject.replace(/((\b[A-Z]{3,}-\d+\b)+)/g, '[$1](' + jiraUrl + '$1)');
             }
 
             // remove references that already appear in the subject
@@ -249,10 +258,22 @@ function getWriterOpts () {
             return commit;
         };
 
-        config.writerOpts.headerPartial = config.writerOpts.headerPartial.replace('/compare/{{previousTag}}...{{currentTag}}', '/compare/commits?targetBranch=refs%2Ftags%2F{{previousTag}}&sourceBranch=refs%2Ftags%2F{{currentTag}}')
+        if (repoCompareUrl) {
+            config.writerOpts.headerPartial = config.writerOpts.headerPartial.replace('/compare/{{previousTag}}...{{currentTag}}', repoCompareUrl);
+        }
 
         return config.writerOpts;
 
     });
+
+}
+
+function _readConfig (gitRoot) {
+
+    try {
+        return JSON.parse($fs.readFileSync($path.resolve(gitRoot, '.changelog.json')).toString());
+    } catch (e) {
+        return {};
+    }
 
 }
