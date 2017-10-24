@@ -1,4 +1,13 @@
 {
   "jiraUrl": "",
-  "repoCompareUrl": "/compare/commits?targetBranch=refs%2Ftags%2F{{previousTag}}&sourceBranch=refs%2Ftags%2F{{currentTag}}"
+  "repoCompareUrl": "/compare/commits?targetBranch=refs%2Ftags%2F{{previousTag}}&sourceBranch=refs%2Ftags%2F{{currentTag}}",
+  "targetsMarkdown": [
+    "./dist/changelogtarget.md"
+  ],
+  "targetsConfluenceMarkup": [
+    "./dist/changelogtarget.txt"
+  ],
+  "targetsHtml": [
+    "./dist/changelogtarget.html"
+  ]
 }

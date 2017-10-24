@@ -5,6 +5,7 @@ const $git = require('./lib/git');
 const $constants = require('./lib/constants');
 const $config = require('./lib/config');
 const $utils = require('./lib/utils');
+const $output = require('./lib/output');
 
 const changelogConfig = $config.getConfig();
 
@@ -32,7 +33,7 @@ Promise.all([changelogConfig, $git.getAllCommits()])
     const orderedTags = $utils.sortTags(Object.keys(taggedCommits));
 
     let previousTag;
-    return orderedTags.reduce((promise, tag) => {
+    const markdownPromise = orderedTags.reduce((promise, tag) => {
       return promise.then(markdownSoFar => new Promise(resolve => {
 
         // sort commits in tag
@@ -64,6 +65,20 @@ Promise.all([changelogConfig, $git.getAllCommits()])
 
     }, Promise.resolve(''));
 
+    return Promise.all([ markdownPromise, config ]);
+
+  })
+  .then(([ markdown, config ]) => {
+    if (config.targetsMarkdown && config.targetsMarkdown.length) {
+      $output.asMarkdown(markdown, config.targetsMarkdown);
+    }
+    if (config.targetsConfluenceMarkup && config.targetsConfluenceMarkup.length) {
+      $output.asConfluenceMarkup(markdown, config.targetsConfluenceMarkup);
+    }
+    if (config.targetsHtml && config.targetsHtml.length) {
+      $output.asHtml(markdown, config.targetsHtml);
+    }
+    return markdown;
   })
   .then(result => console.log(result))
   .catch(err => console.error(err));
