@@ -1,6 +1,7 @@
 {
   "jiraUrl": "",
   "repoCompareUrl": "/compare/commits?targetBranch=refs%2Ftags%2F{{previousTag}}&sourceBranch=refs%2Ftags%2F{{currentTag}}",
+  "repositoryUrl": "https://github.com/KrekkieD/buenos-changelog",
   "targetsMarkdown": [
     "./dist/changelogtarget.md"
   ],
