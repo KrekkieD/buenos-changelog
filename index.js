@@ -34,7 +34,7 @@ Promise.all([changelogConfig, $git.getAllCommits()])
 
     let previousTag;
     const markdownPromise = orderedTags.reduce((promise, tag) => {
-      return promise.then(markdownSoFar => new Promise(resolve => {
+      return promise.then((markdownSoFar) => new Promise(async (resolve) => {
 
         // sort commits in tag
         taggedCommits[tag].sort((a, b) => {
@@ -42,12 +42,15 @@ Promise.all([changelogConfig, $git.getAllCommits()])
           return a.unixtime > b.unixtime ? -1 : 1;
         });
 
+        const tagDate = await $git.getTagDate(tag);
+
         const changelogWriter = $conventionalChangelogWriter({
           version: tag,
           repoUrl: config.repositoryUrl,
           linkCompare: !!previousTag && tag !== $constants.UNRELEASED,
           previousTag: previousTag,
-          currentTag: tag
+          currentTag: tag,
+          date: tagDate
         }, config.writerOpts);
 
         const upstream = $through.obj();
