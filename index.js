@@ -75,9 +75,6 @@ Promise.all([changelogConfig, $git.getAllCommits()])
     if (config.targetsMarkdown && config.targetsMarkdown.length) {
       $output.asMarkdown(markdown, config.targetsMarkdown);
     }
-    if (config.targetsConfluenceMarkup && config.targetsConfluenceMarkup.length) {
-      $output.asConfluenceMarkup(markdown, config.targetsConfluenceMarkup);
-    }
     if (config.targetsHtml && config.targetsHtml.length) {
       $output.asHtml(markdown, config.targetsHtml);
     }

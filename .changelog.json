@@ -5,9 +5,6 @@
   "targetsMarkdown": [
     "./dist/changelogtarget.md"
   ],
-  "targetsConfluenceMarkup": [
-    "./dist/changelogtarget.txt"
-  ],
   "targetsHtml": [
     "./dist/changelogtarget.html"
   ]
